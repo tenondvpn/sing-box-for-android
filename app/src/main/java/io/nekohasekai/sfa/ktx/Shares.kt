@@ -46,7 +46,7 @@ suspend fun Context.shareProfile(profile: Profile) {
                 Intent(Intent.ACTION_SEND).setType("application/octet-stream")
                     .setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     .putExtra(Intent.EXTRA_STREAM, uri),
-                getString(R.string.abc_shareactionprovider_share_with)
+                "getString(R.string.abc_shareactionprovider_share_with)"
             )
         )
     }
@@ -58,7 +58,7 @@ fun FragmentActivity.shareProfileURL(profile: Profile) {
         profile.typed.remoteURL
     )
     val imageSize = dp2px(256)
-    val color = getAttrColor(com.google.android.material.R.attr.colorPrimary)
+    val color = Color.RED
     val image = QRCodeWriter().encode(link, BarcodeFormat.QR_CODE, imageSize, imageSize, null)
     val imageWidth = image.width
     val imageHeight = image.height
@@ -75,3 +75,5 @@ fun FragmentActivity.shareProfileURL(profile: Profile) {
     val dialog = QRCodeDialog(bitmap)
     dialog.show(supportFragmentManager, "share-profile-url")
 }
+
+

@@ -179,7 +179,7 @@ class BoxService(
             }.onFailure {
                 writeLog("service: error when closing: $it")
             }
-            Seq.destroyRef(refnum)
+//            Seq.destroyRef(refnum)
         }
         commandServer?.setService(null)
         commandServer?.resetLog()
@@ -236,7 +236,7 @@ class BoxService(
                 }.onFailure {
                     writeLog("service: error when closing: $it")
                 }
-                Seq.destroyRef(refnum)
+//                Seq.destroyRef(refnum)
             }
             commandServer?.setService(null)
             boxService = null
@@ -244,7 +244,7 @@ class BoxService(
 
             commandServer?.apply {
                 close()
-                Seq.destroyRef(refnum)
+//                Seq.destroyRef(refnum)
             }
             commandServer = null
             Settings.startedByUser = false

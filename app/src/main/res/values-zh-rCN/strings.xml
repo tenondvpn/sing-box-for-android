@@ -163,4 +163,6 @@
     <string name="open_settings">打开设置</string>
     <string name="notification_permission_title">通知权限</string>
     <string name="notification_permission_required_description">sing-box 无法在没有发送通知权限的情况下显示实时网速。请授予权限或禁用实时网速通知后再启动服务。</string>
+    <string name="abc_shareactionprovider_share_with">abc_shareactionprovider_share_with</string>
+
 </resources>
