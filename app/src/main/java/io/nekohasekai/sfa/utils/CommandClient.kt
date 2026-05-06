@@ -85,7 +85,7 @@ open class CommandClient(
             runCatching {
                 disconnect()
             }
-            Seq.destroyRef(refnum)
+//            Seq.destroyRef(refnum)
         }
         commandClient = null
     }

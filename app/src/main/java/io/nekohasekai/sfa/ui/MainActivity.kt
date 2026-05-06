@@ -9,6 +9,7 @@ import android.net.VpnService
 import android.os.Build
 import android.os.Bundle
 import android.text.Html
+import android.util.Log
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
@@ -67,8 +68,63 @@ class MainActivity : AbstractActivity<ActivityMainBinding>(),
 
     val serviceStatus = MutableLiveData(Status.Stopped)
 
+//    private lateinit var binding: ActivityMainBinding
+
+    // 注册一个 ActivityResultLauncher 来接收 VPN 权限请求的结果
+    private val vpnPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        // 当用户从 VPN 权限对话框返回时，会执行这里
+        Log.i("MainActivity", "VPN 权限请求返回，结果码: ${result.resultCode}")
+        if (result.resultCode == RESULT_OK) {
+            // 用户授予了权限，现在可以安全地再次尝试启动 VPN
+            Log.i("MainActivity", "用户已授予 VPN 权限，再次尝试启动服务。")
+            (application as Application).tryStartVpn()
+        } else {
+            // 用户拒绝了权限
+            Log.w("MainActivity", "用户拒绝了 VPN 权限。")
+            // 你可以在这里给用户一个提示，例如使用 Toast 或 Snackbar
+        }
+    }
+
+    private fun handleVpnPermissionRequest(intent: Intent) {
+        // 检查是否是 Application 要求我们来请求 VPN 权限
+        if (intent.getBooleanExtra("request_vpn_permission", false)) {
+            Log.i("MainActivity", "收到来自 Application 的 VPN 权限请求。")
+            // 清除标记，防止重复请求
+            intent.removeExtra("request_vpn_permission")
+
+            // 再次调用 VpnService.prepare() 以获取用于启动权限对话框的 Intent
+            val prepareIntent = android.net.VpnService.prepare(this)
+            if (prepareIntent != null) {
+                // 使用我们注册的 launcher 来启动这个 Intent
+                vpnPermissionLauncher.launch(prepareIntent)
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // 使用 ViewBinding 初始化布局
+//        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        // 为新添加的按钮设置点击监听器
+        binding.buttonStartVpn.setOnClickListener {
+            Log.d("MainActivity", "Start VPN 按钮被点击")
+            // 获取 Application 实例并调用 tryStartVpn 方法
+            (application as Application).tryStartVpn()
+        }
+
+        binding.buttonStopVpn.setOnClickListener {
+            Log.d("MainActivity", "Stop VPN 按钮被点击")
+            // 获取 Application 实例并调用 tryStartVpn 方法
+            (application as Application).stopProxy()
+        }
+
+        // 处理从 Application 类跳转过来的权限请求
+        handleVpnPermissionRequest(intent)
 
         navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment_activity_my) as NavHostFragment
@@ -108,6 +164,11 @@ class MainActivity : AbstractActivity<ActivityMainBinding>(),
 
     override public fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        // 当 Activity 已经在运行时，通过 onNewIntent 接收新的 Intent
+        if (intent != null) {
+            handleVpnPermissionRequest(intent)
+        }
+
         val uri = intent.data ?: return
         when (intent.action) {
             Action.OPEN_URL -> {

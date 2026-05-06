@@ -30,10 +30,10 @@
         android:id="@+id/scanVPNResult"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
         android:clipChildren="false"
         android:clipToPadding="false"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
         android:paddingBottom="16dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
