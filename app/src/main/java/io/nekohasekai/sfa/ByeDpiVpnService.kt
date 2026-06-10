@@ -156,14 +156,20 @@ class ByeDpiVpnService : VpnService() {
     private suspend fun stopProxy() {
         Log.i(TAG, "Stopping proxy")
 
-        if (status == ServiceStatus.Disconnected) {
-            Log.w(TAG, "Proxy already disconnected")
-            return
+        try {
+            byeDpiProxy.stopProxy()
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to stop proxy", e)
         }
 
-        byeDpiProxy.stopProxy()
-        proxyJob?.join()
-        proxyJob = null
+        val job = proxyJob
+        val currentJob = currentCoroutineContext()[Job]
+        if (job != null && job != currentJob) {
+            job.join()
+        }
+        if (proxyJob == job) {
+            proxyJob = null
+        }
 
         Log.i(TAG, "Proxy stopped")
     }
@@ -175,9 +181,31 @@ class ByeDpiVpnService : VpnService() {
         } catch (e: Exception) {
             Log.e(TAG, "Failed to stop VPN", e)
         } finally {
+            cleanupVpnInterface()
+            stopForegroundCompat()
+            isRunning = false
+            status = ServiceStatus.Disconnected
+            stopSelf()
         }
-        status = ServiceStatus.Disconnected
-        stopSelf()
+    }
+
+    private fun cleanupVpnInterface() {
+        try {
+            vpnInterface?.close()
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to close VPN interface", e)
+        } finally {
+            vpnInterface = null
+        }
+    }
+
+    private fun stopForegroundCompat() {
+        try {
+            @Suppress("DEPRECATION")
+            stopForeground(true)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to stop foreground service", e)
+        }
     }
 
     // 假设这是你定义的挂起函数
@@ -316,9 +344,18 @@ class ByeDpiVpnService : VpnService() {
     }
 
     override fun onDestroy() {
-        super.onDestroy()
+        try {
+            byeDpiProxy.stopProxy()
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to stop proxy on destroy", e)
+        }
+        cleanupVpnInterface()
+        stopForegroundCompat()
+        isRunning = false
+        status = ServiceStatus.Disconnected
         // ✅ 服务销毁时清理协程
         serviceScope.cancel()
+        super.onDestroy()
 //        stop()
     }
 }
