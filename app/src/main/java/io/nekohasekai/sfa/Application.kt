@@ -428,7 +428,7 @@ class Application : Application() {
         val initError = StringBuilder()
         val initRes = StringBuilder()
         val config_str = """
-{"private_key": "1f7ae5a528463841ec3a345b644120345d26178a0270f50983acafa36fbbee551205c46e9a89bf2a2d7f8e82c6fc8feb75b33077ff01b465be2f646b20a7e94f034e1a0d1c2046d1e91750c3105897dc","snis":["https://test1/","https://test2/","https://test3/"],"local_country": "CN","bootstrap":[{"country":"SG","pubkey":"031c68b2775c6fd1e2f0a5eefb7141d5319315c48b68edfbeb8df53d02be0fedf2", "ip":"47.128.73.97","port":443},{"country":"SG","pubkey":"0233ad0b5b715241ae4fede40d6e253bb0158dd4094b7afbafb81153ed2c020106", "ip":"54.254.221.255","port":443},{"country":"SG","pubkey":"0238fcf136d9836572d9f56f925e567c4ff753f8e29a5362aa1ba997e86b6bf062", "ip":"13.250.17.215","port":443}]}
+{"private_key": "","snis":["https://test1/","https://test2/","https://test3/"],"local_country": "SG","vless_uuid":"222fee9d-8826-4f38-bfc4-4e22955bf25c","reality_public_key":"nLkP0ntoQZFAfgh2F77xiG-sCEwr4QZ1VWf2u49S4Ew","reality_short_id":"f692d9362736edd9","reality_flow":"xtls-rprx-vision","server_name":"www.microsoft.com","db_path":"${filesDir.absolutePath}/p2p_db","bootstrap":[{"country":"SG","pubkey":"0260950cfbd003c5e606dfa60c59d1b949c275c283e684197f695527002cd7d4cb", "ip":"52.221.230.0","port":29001},{"country":"SG","pubkey":"02754dd6774d7fb84f8ccac1d3aa9cdae331aa6c85c53681043916ae7b1f943d9a", "ip":"54.179.255.89","port":29001}]}
             """.trimIndent();
         var initRet = P2pNative.p2pInit(
             config = config_str,  // 示例配置 JSON 字符串
